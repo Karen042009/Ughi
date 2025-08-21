@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="hy">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ughi Admin</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <header>
+      <h1>Ughi Admin</h1>
+      <p>Կառավարեք վայրերն ու կարծիքները (MVP)</p>
+      <a href="/" class="admin-back">⬅ վերադարձ գլխավոր</a>
+    </header>
+    <div class="admin-container">
+      <section class="admin-section">
+        <h2>Ավելացնել վայր</h2>
+        <form id="add-business-form" class="admin-form">
+          <div class="form-row">
+            <label for="biz-name">Անուն</label>
+            <input id="biz-name" name="name" type="text" required />
+          </div>
+          <div class="form-row">
+            <label for="biz-type">Տեսակ</label>
+            <input
+              id="biz-type"
+              name="type"
+              type="text"
+              placeholder="Hotel / Restaurant / Attraction"
+              required
+            />
+          </div>
+          <div class="form-row grid-2">
+            <div>
+              <label for="biz-lat">Լատիտուդ</label>
+              <input
+                id="biz-lat"
+                name="latitude"
+                type="number"
+                step="any"
+                required
+              />
+            </div>
+            <div>
+              <label for="biz-lng">Լոնգիտուդ</label>
+              <input
+                id="biz-lng"
+                name="longitude"
+                type="number"
+                step="any"
+                required
+              />
+            </div>
+          </div>
+          <button type="submit">Ավելացնել վայր</button>
+        </form>
+      </section>
+
+      <section class="admin-section">
+        <div class="admin-toolbar">
+          <h2>Վայեր <span id="biz-count" class="badge">0</span></h2>
+          <input
+            id="admin-search"
+            type="text"
+            placeholder="Որոնել վայր..."
+            aria-label="Որոնել վայր"
+          />
+        </div>
+        <ul id="admin-business-list" class="admin-list"></ul>
+      </section>
+
+      <section class="admin-section">
+        <div class="admin-toolbar">
+          <h2>Կարծիքներ</h2>
+          <span id="selected-business-label" class="muted"
+            >Ընտրեք վայր ցանկից</span
+          >
+        </div>
+        <div id="reviews-admin">
+          <form id="add-review-form" class="admin-form">
+            <input type="hidden" id="admin-business-id" />
+            <div class="form-row grid-3">
+              <div>
+                <label for="admin-rating">Գնահատական</label>
+                <select id="admin-rating">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+              </div>
+              <div>
+                <label for="admin-author">Ես՝</label>
+                <select id="admin-author">
+                  <option value="Tourist">Շրջաշրջիկ</option>
+                  <option value="Employee">Աշխատակից</option>
+                </select>
+              </div>
+              <div>
+                <label>&nbsp;</label>
+                <button type="submit">Ավելացնել կարծիք</button>
+              </div>
+            </div>
+            <div class="form-row">
+              <label for="admin-comment">Մեկնաբանություն</label>
+              <textarea id="admin-comment" rows="3" required></textarea>
+            </div>
+          </form>
+          <ul id="admin-reviews-list" class="admin-list"></ul>
+        </div>
+      </section>
+    </div>
+
+    <!-- Floating Up/Down buttons -->
+    <button id="scroll-top" class="fab fab-up" aria-label="Վերև">↑</button>
+    <button id="scroll-bottom" class="fab fab-down" aria-label="Ներքև">
+      ↓
+    </button>
+
+    <div id="toast" class="toast hidden" aria-live="polite"></div>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+  </body>
+</html>

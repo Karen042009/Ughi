@@ -2,6 +2,7 @@
 from app import create_app, db
 from app.models import Business, Review
 import os
+import random
 
 # Create an app instance to work with
 app = create_app()
@@ -85,7 +86,7 @@ with app.app_context():
     db.session.add_all([b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12])
     db.session.commit()  # assign IDs
 
-    # Reviews (hy/en/ru mixed)
+    # Reviews (hy/en/ru mixed) for initial set
     seed_reviews = [
         Review(
             business_id=b1.id,
@@ -168,6 +169,68 @@ with app.app_context():
     ]
 
     db.session.add_all(seed_reviews)
+    db.session.commit()
+
+    # ---- Generate 100 additional businesses strictly within Armenia (inner bbox) ----
+    random.seed(42)
+    # Inner bounding box fully within Armenia to avoid borders
+    LAT_MIN, LAT_MAX = 39.0, 41.2
+    LON_MIN, LON_MAX = 44.0, 46.0
+    types = ["Hotel", "Restaurant", "Attraction", "Cafe", "Museum"]
+    armenian_comments = [
+        "Ապահով և հարմար տեղ։",
+        "Լավ սպասարկում, խորհուրդ եմ տալիս։",
+        "Գիշերը լույսավոր է, խնդիրներ չունեցանք։",
+        "Քիչ աղմուկ, ընտանիքի համար հարմար։",
+    ]
+    english_comments = [
+        "Felt safe, staff were friendly.",
+        "Busy at night, but overall okay.",
+        "Clean and well-organized.",
+        "Great for solo travelers.",
+    ]
+    russian_comments = [
+        "Безопасно и уютно.",
+        "Персонал вежливый, место понравилось.",
+        "Немного шумно вечером.",
+        "Хорошее освещение и чисто.",
+    ]
+
+    generated_businesses = []
+    for i in range(100):
+        lat = random.uniform(LAT_MIN, LAT_MAX)
+        lng = random.uniform(LON_MIN, LON_MAX)
+        b = Business(
+            name=f"Armenia Spot #{i+1}",
+            type=random.choice(types),
+            latitude=lat,
+            longitude=lng,
+        )
+        generated_businesses.append(b)
+
+    db.session.add_all(generated_businesses)
+    db.session.commit()
+
+    # Build reviews for generated businesses (2-4 each, multilingual)
+    generated_reviews = []
+    for b in generated_businesses:
+        for _ in range(random.randint(2, 4)):
+            lang = random.choice(["hy", "en", "ru"])
+            if lang == "hy":
+                comment = random.choice(armenian_comments)
+            elif lang == "en":
+                comment = random.choice(english_comments)
+            else:
+                comment = random.choice(russian_comments)
+            r = Review(
+                business_id=b.id,
+                rating=random.randint(2, 5),
+                comment=comment,
+                author_type=random.choice(["Tourist", "Employee"]),
+            )
+            generated_reviews.append(r)
+
+    db.session.add_all(generated_reviews)
     db.session.commit()
 
     print("Database has been initialized and seeded with sample data!")
