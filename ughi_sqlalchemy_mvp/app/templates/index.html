@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="hy">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ughi - Վստահ ճանապարհորդություն Հայաստանում</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <header>
+      <h1>Ughi (Ուղի)</h1>
+      <p id="tagline">
+        Ձեր ուղեցույցը անվտանգ և վստահելի ճանապարհորդության համար Հայաստանում։
+      </p>
+      <div class="lang-switch">
+        <label for="lang-select" class="visually-hidden">Language</label>
+        <select id="lang-select" aria-label="Language">
+          <option value="hy">Հայ</option>
+          <option value="en">EN</option>
+          <option value="ru">RU</option>
+        </select>
+      </div>
+    </header>
+    <div class="main-container">
+      <div id="map"></div>
+      <div id="sidebar">
+        <div id="search-container">
+          <input
+            id="search"
+            type="text"
+            placeholder="Որոնել ըստ անվան կամ տեսակի..."
+            aria-label="Որոնում"
+          />
+        </div>
+        <ul id="business-list"></ul>
+        <div id="sidebar-content">
+          <h2 id="welcome-title">Բարի գալուստ Ուղի</h2>
+          <p id="welcome-desc">
+            Քարտեզի վրա կամ ցանկից ընտրեք վայր՝ տեսնելու անվտանգության
+            մանրամասներն ու կարծիքները։
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MODAL FOR REVIEW FORM (Initially Hidden) ===== -->
+    <div
+      id="review-modal"
+      class="modal-overlay hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      tabindex="-1"
+    >
+      <div class="modal-content">
+        <button class="close-button" type="button" aria-label="Close">
+          &times;
+        </button>
+        <h3 id="modal-title">Թողեք անանուն կարծիք</h3>
+        <div id="modal-business-name" class="modal-business-name"></div>
+        <form id="review-form">
+          <input type="hidden" id="business-id" name="business-id" />
+          <div class="form-group">
+            <label id="rating-label">Ձեր գնահատականը (1-5):</label>
+            <div class="rating-stars">
+              <input
+                type="radio"
+                id="star1"
+                name="rating"
+                value="1"
+                required
+              /><label for="star1">★</label>
+              <input type="radio" id="star2" name="rating" value="2" /><label
+                for="star2"
+                >★</label
+              >
+              <input type="radio" id="star3" name="rating" value="3" /><label
+                for="star3"
+                >★</label
+              >
+              <input type="radio" id="star4" name="rating" value="4" /><label
+                for="star4"
+                >★</label
+              >
+              <input type="radio" id="star5" name="rating" value="5" /><label
+                for="star5"
+                >★</label
+              >
+            </div>
+          </div>
+          <div class="form-group">
+            <label id="comment-label" for="comment"
+              >Ձեր մեկնաբանությունը՝</label
+            >
+            <textarea id="comment" name="comment" rows="4" required></textarea>
+          </div>
+          <div class="form-group">
+            <label id="iam-label">Ես՝</label>
+            <select id="author-type" name="author-type" required>
+              <option value="Tourist">Շրջաշրջիկ</option>
+              <option value="Employee">Աշխատակից</option>
+            </select>
+          </div>
+          <button id="submit-btn" type="submit">Ուղարկել կարծիքը</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toast" class="toast hidden" aria-live="polite"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>
