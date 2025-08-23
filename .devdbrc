@@ -1,0 +1,6 @@
+[
+  {
+    "type": "sqlite",
+    "path": "/home/karen/Ughi/ughi_sqlalchemy_mvp/instance/ughi.db"
+  }
+]

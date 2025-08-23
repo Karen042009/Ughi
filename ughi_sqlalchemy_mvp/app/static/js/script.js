@@ -8,13 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
             welcomeTitle: 'Բարի գալուստ Ուղի',
             welcomeDesc: 'Քարտեզի վրա կամ ցանկից ընտրեք վայր՝ տեսնելու անվտանգության մանրամասներն ու կարծիքները։',
             leaveReview: 'Թողնել կարծիք',
+            submitReview: 'Ուղարկել կարծիքը',
             loading: 'Բեռնվում է...',
             noReviews: 'Դեռ կարծիքներ չկան։ Եղեք առաջինը։',
             avgLabel: 'Միջին գնահատական՝',
-            ratingLabel: 'Ձեր գնահատականը (1-5):',
+            ratingLabel: 'Ձեր գնահատականը՝',
             commentLabel: 'Ձեր մեկնաբանությունը՝',
             iamLabel: 'Ես՝',
-            submit: 'Ուղարկել կարծիքը',
+            tourist: 'Շրջաշրջիկ',
+            employee: 'Աշխատակից',
+            reviewsTitle: 'Կարծիքներ',
+            reviewCount: 'կարծիք',
             errorLoad: 'Տեղանքը բեռնել չհաջողվեց։ Կրկնեք ավելի ուշ։',
             errorReviews: 'Կարծիքները բեռնել չհաջողվեց։',
             selectRating: 'Խնդրում ենք ընտրել գնահատական։',
@@ -26,13 +30,17 @@ document.addEventListener('DOMContentLoaded', () => {
             welcomeTitle: 'Welcome to Ughi',
             welcomeDesc: 'Select a place on the map or from the list to see safety details and reviews.',
             leaveReview: 'Leave a Review',
+            submitReview: 'Submit Review',
             loading: 'Loading...',
             noReviews: 'No reviews yet. Be the first!',
             avgLabel: 'Average rating:',
-            ratingLabel: 'Your Rating (1-5):',
+            ratingLabel: 'Your Rating:',
             commentLabel: 'Your Comment:',
             iamLabel: 'I am a:',
-            submit: 'Submit Review',
+            tourist: 'Tourist',
+            employee: 'Employee',
+            reviewsTitle: 'Reviews',
+            reviewCount: 'review(s)',
             errorLoad: 'Failed to load locations. Please try again later.',
             errorReviews: 'Could not load reviews.',
             selectRating: 'Please select a rating.',
@@ -44,13 +52,17 @@ document.addEventListener('DOMContentLoaded', () => {
             welcomeTitle: 'Добро пожаловать в Ughi',
             welcomeDesc: 'Выберите место на карте или из списка, чтобы увидеть детали и отзывы.',
             leaveReview: 'Оставить отзыв',
+            submitReview: 'Отправить отзыв',
             loading: 'Загрузка...',
             noReviews: 'Отзывов пока нет. Будьте первым!',
             avgLabel: 'Средняя оценка:',
-            ratingLabel: 'Ваша оценка (1-5):',
+            ratingLabel: 'Ваша оценка:',
             commentLabel: 'Ваш комментарий:',
             iamLabel: 'Я:',
-            submit: 'Отправить отзыв',
+            tourist: 'Турист',
+            employee: 'Сотрудник',
+            reviewsTitle: 'Отзывы',
+            reviewCount: 'отзыв(ов)',
             errorLoad: 'Не удалось загрузить места. Попробуйте позже.',
             errorReviews: 'Не удалось загрузить отзывы.',
             selectRating: 'Пожалуйста, выберите оценку.',
@@ -69,10 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const welcomeTitle = document.getElementById('welcome-title');
     const welcomeDesc = document.getElementById('welcome-desc');
     const langSelect = document.getElementById('lang-select');
-
     const sidebarContent = document.getElementById('sidebar-content');
     const searchInput = document.getElementById('search');
     const businessList = document.getElementById('business-list');
+
+    // --- Map Initialization ---
     const map = L.map('map').setView([40.1792, 44.4991], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
 
@@ -82,11 +95,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const reviewForm = document.getElementById('review-form');
     const businessIdInput = document.getElementById('business-id');
     const modalBusinessName = document.getElementById('modal-business-name');
+    const modalTitle = document.getElementById('modal-title');
     const ratingLabel = document.getElementById('rating-label');
     const commentLabel = document.getElementById('comment-label');
     const iamLabel = document.getElementById('iam-label');
     const submitBtn = document.getElementById('submit-btn');
-    const modalTitle = document.getElementById('modal-title');
 
     const openModal = () => modal.classList.remove('hidden');
     const closeModal = () => modal.classList.add('hidden');
@@ -94,38 +107,40 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-    // Ensure robust LTR star behavior with JS active class
-    const starInputs = Array.from(document.querySelectorAll('.rating-stars input[type="radio"]'));
-    const starLabels = Array.from(document.querySelectorAll('.rating-stars label'));
-    function updateStarActives(val) {
-        starLabels.forEach((label, idx) => {
-            const labelVal = idx + 1; // labels are ordered 1..5
-            if (labelVal <= val) label.classList.add('active'); else label.classList.remove('active');
-        });
-    }
-    starInputs.forEach(inp => {
-        inp.addEventListener('change', () => updateStarActives(parseInt(inp.value)));
-    });
-
     // --- Helper Functions ---
-    const t = (key) => i18n[currentLang][key];
+    const t = (key) => i18n[currentLang][key] || key;
     const renderStars = (rating) => '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
 
     function applyTranslations() {
+        document.documentElement.lang = currentLang;
         tagline.textContent = t('tagline');
-        welcomeTitle.textContent = t('welcomeTitle');
-        welcomeDesc.textContent = t('welcomeDesc');
         searchInput.placeholder = t('searchPlaceholder');
+
+        // Check if welcome screen is visible
+        const welcomeTitleEl = document.getElementById('welcome-title');
+        if (welcomeTitleEl) {
+            welcomeTitleEl.textContent = t('welcomeTitle');
+            document.getElementById('welcome-desc').textContent = t('welcomeDesc');
+        }
+
+        modalTitle.textContent = t('leaveReview');
         ratingLabel.textContent = t('ratingLabel');
         commentLabel.textContent = t('commentLabel');
         iamLabel.textContent = t('iamLabel');
-        submitBtn.textContent = t('submit');
-        modalTitle.textContent = t('leaveReview');
-        // Re-render current sidebar block if it exists
+        submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> ${t('submitReview')}`;
+        
         const openBtn = document.getElementById('open-review-modal');
-        if (openBtn) openBtn.textContent = t('leaveReview');
-        // refresh list so counts/labels remain in place (stars are icon-only)
+        if (openBtn) {
+            openBtn.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> ${t('leaveReview')}`;
+        }
+        
         renderBusinessList(searchInput.value);
+        
+        const currentBusinessId = businessIdInput.value;
+        if(currentBusinessId){
+            const business = businesses.find(b => b.id == currentBusinessId);
+            if(business) handleMarkerClick(business);
+        }
     }
 
     langSelect.addEventListener('change', () => {
@@ -136,12 +151,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderBusinessList(filterText = '') {
         const q = filterText.trim().toLowerCase();
         const filtered = businesses.filter(b => b.name.toLowerCase().includes(q) || b.type.toLowerCase().includes(q));
-        businessList.innerHTML = filtered.map(b => `
+        businessList.innerHTML = filtered.map(b => {
+            const stats = businessStats[b.id] || { avg_rating: 0, review_count: 0 };
+            return `
             <li class="business-item" data-id="${b.id}">
                 <div class="business-title">${b.name}</div>
                 <div class="business-sub">${b.type}</div>
-                <div class="business-rating">${renderStars(businessStats[b.id]?.avg_rating || 0)} <span class="count">(${businessStats[b.id]?.review_count || 0})</span></div>
-            </li>`).join('');
+                <div class="business-rating">${renderStars(stats.avg_rating)} <span class="count">(${stats.review_count})</span></div>
+            </li>`;
+        }).join('');
 
         businessList.querySelectorAll('.business-item').forEach(li => {
             li.addEventListener('click', () => {
@@ -167,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 markers[business.id] = marker;
             });
             renderBusinessList('');
-            applyTranslations();
         } catch (error) {
             console.error('Failed to load businesses:', error);
             sidebarContent.innerHTML = `<p>${t('errorLoad')}</p>`;
@@ -178,21 +195,27 @@ document.addEventListener('DOMContentLoaded', () => {
         businessIdInput.value = business.id;
         modalBusinessName.textContent = business.name;
 
+        const stats = businessStats[business.id];
+
         sidebarContent.innerHTML = `
             <h2>${business.name}</h2>
             <p class="location-type">${business.type}</p>
             <div class="rating-summary">
-                <div><strong>${t('avgLabel')}</strong> ${businessStats[business.id].avg_rating.toFixed(2)} / 5</div>
-                <div class="review-rating">${renderStars(businessStats[business.id].avg_rating)}</div>
-                <div class="review-meta"><span>${businessStats[business.id].review_count} ${currentLang==='en'?'review(s)': currentLang==='ru'?'отзыв(ов)':'կարծիք'}</span></div>
+                <div class="avg-rating-text"><strong>${t('avgLabel')}</strong> ${stats.avg_rating.toFixed(2)} / 5</div>
+                <div class="review-rating">${renderStars(stats.avg_rating)}</div>
+                <div class="review-meta"><span>${stats.review_count} ${t('reviewCount')}</span></div>
             </div>
-            <button id="open-review-modal">${t('leaveReview')}</button>
-            <div id="reviews-list">${t('loading')}</div>`;
+            <button id="open-review-modal"><i class="fa-solid fa-pen-to-square"></i> ${t('leaveReview')}</button>
+            <div id="reviews-container">
+                <h3>${t('reviewsTitle')}</h3>
+                <div id="reviews-list">${t('loading')}</div>
+            </div>`;
 
         document.getElementById('open-review-modal').addEventListener('click', () => {
-            // reset star actives when opening modal
-            updateStarActives(0);
-            starInputs.forEach(i=>{ i.checked = false; });
+            reviewForm.reset();
+            // Clear radio button selection visually
+            const checkedStar = document.querySelector('.rating-stars input:checked');
+            if (checkedStar) checkedStar.checked = false;
             openModal();
         });
 
@@ -211,15 +234,19 @@ document.addEventListener('DOMContentLoaded', () => {
             reviewsList.innerHTML = `<p>${t('noReviews')}</p>`;
             return;
         }
-        reviewsList.innerHTML = reviews.map(review => `
+        reviewsList.innerHTML = reviews.map(review => {
+            const authorTypeClass = review.author_type.toLowerCase();
+            const authorTypeText = t(authorTypeClass);
+            return `
             <div class="review-item">
                 <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
                 <p>${review.comment}</p>
                 <div class="review-meta">
-                    <span class="author-type">${review.author_type === 'Employee' ? (currentLang==='ru'?'Сотрудник':'Աշխատակից') : (currentLang==='en'?'Tourist':'Շրջաշրջիկ')}</span>
+                    <span class="author-badge ${authorTypeClass}">${authorTypeText}</span>
                     <span>${new Date(review.created_at).toLocaleDateString()}</span>
                 </div>
-            </div>`).join('');
+            </div>`;
+        }).join('');
     }
 
     async function handleReviewSubmit(event) {
@@ -234,6 +261,9 @@ document.addEventListener('DOMContentLoaded', () => {
             comment: formData.get('comment'),
             author_type: formData.get('author-type')
         };
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${t('submitReview')}`;
 
         try {
             const response = await fetch('/api/reviews', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reviewData) });
@@ -242,7 +272,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             closeModal();
             reviewForm.reset();
-            updateStarActives(0);
 
             const currentId = reviewData.business_id;
             const stats = businessStats[currentId];
@@ -255,6 +284,9 @@ document.addEventListener('DOMContentLoaded', () => {
             renderBusinessList(searchInput.value);
         } catch (error) {
             alert(`${t('errorSubmit')}: ${error.message}`);
+        } finally {
+             submitBtn.disabled = false;
+             submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> ${t('submitReview')}`;
         }
     }
 

@@ -4,10 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ughi - Վստահ ճանապարհորդություն Հայաստանում</title>
+    <!-- Leaflet CSS -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <!-- Custom CSS -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
@@ -15,7 +22,7 @@
   </head>
   <body>
     <header>
-      <h1>Ughi (Ուղի)</h1>
+      <h1><i class="fa-solid fa-map-location-dot"></i> Ughi (Ուղի)</h1>
       <p id="tagline">
         Ձեր ուղեցույցը անվտանգ և վստահելի ճանապարհորդության համար Հայաստանում։
       </p>
@@ -28,10 +35,12 @@
         </select>
       </div>
     </header>
+
     <div class="main-container">
       <div id="map"></div>
       <div id="sidebar">
         <div id="search-container">
+          <i class="fa-solid fa-magnifying-glass"></i>
           <input
             id="search"
             type="text"
@@ -41,11 +50,14 @@
         </div>
         <ul id="business-list"></ul>
         <div id="sidebar-content">
-          <h2 id="welcome-title">Բարի գալուստ Ուղի</h2>
-          <p id="welcome-desc">
-            Քարտեզի վրա կամ ցանկից ընտրեք վայր՝ տեսնելու անվտանգության
-            մանրամասներն ու կարծիքները։
-          </p>
+          <div class="welcome-container">
+            <i class="fa-regular fa-compass welcome-icon"></i>
+            <h2 id="welcome-title">Բարի գալուստ Ուղի</h2>
+            <p id="welcome-desc">
+              Քարտեզի վրա կամ ցանկից ընտրեք վայր՝ տեսնելու անվտանգության
+              մանրամասներն ու կարծիքները։
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -63,52 +75,34 @@
         <button class="close-button" type="button" aria-label="Close">
           &times;
         </button>
-        <h3 id="modal-title">Թողեք անանուն կարծիք</h3>
+        <h3 id="modal-title" class="modal-main-title">Թողնել անանուն կարծիք</h3>
         <div id="modal-business-name" class="modal-business-name"></div>
         <form id="review-form">
           <input type="hidden" id="business-id" name="business-id" />
           <div class="form-group">
-            <label id="rating-label">Ձեր գնահատականը (1-5):</label>
+            <label id="rating-label">Ձեր գնահատականը՝</label>
             <div class="rating-stars">
-              <input
-                type="radio"
-                id="star1"
-                name="rating"
-                value="1"
-                required
-              /><label for="star1">★</label>
-              <input type="radio" id="star2" name="rating" value="2" /><label
-                for="star2"
-                >★</label
-              >
-              <input type="radio" id="star3" name="rating" value="3" /><label
-                for="star3"
-                >★</label
-              >
-              <input type="radio" id="star4" name="rating" value="4" /><label
-                for="star4"
-                >★</label
-              >
-              <input type="radio" id="star5" name="rating" value="5" /><label
-                for="star5"
-                >★</label
-              >
+              <input type="radio" id="star5" name="rating" value="5" required /><label for="star5" title="5 αστέρια">★</label>
+              <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 αστέρια">★</label>
+              <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 αστέρια">★</label>
+              <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 αστέρια">★</label>
+              <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 αστέρι">★</label>
             </div>
           </div>
           <div class="form-group">
-            <label id="comment-label" for="comment"
-              >Ձեր մեկնաբանությունը՝</label
-            >
+            <label id="comment-label" for="comment">Ձեր մեկնաբանությունը՝</label>
             <textarea id="comment" name="comment" rows="4" required></textarea>
           </div>
           <div class="form-group">
-            <label id="iam-label">Ես՝</label>
+            <label id="iam-label" for="author-type">Ես՝</label>
             <select id="author-type" name="author-type" required>
               <option value="Tourist">Շրջաշրջիկ</option>
               <option value="Employee">Աշխատակից</option>
             </select>
           </div>
-          <button id="submit-btn" type="submit">Ուղարկել կարծիքը</button>
+          <button id="submit-btn" type="submit">
+            <i class="fa-solid fa-paper-plane"></i> Ուղարկել կարծիքը
+          </button>
         </form>
       </div>
     </div>
