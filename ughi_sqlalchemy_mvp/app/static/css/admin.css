@@ -1,0 +1,333 @@
+/* /ughi_sqlalchemy_mvp/app/static/css/admin.css */
+
+/* --- Թեմայի փոփոխականներ (Համահունչ style.css-ի հետ) --- */
+:root {
+  --primary-color: #3498db;
+  --primary-hover: #2980b9;
+  --text-dark: #2c3e50;
+  --text-light: #7f8c8d;
+  --text-white: #ffffff;
+  --background-light: #f4f7f6;
+  --background-white: #ffffff;
+  --border-color: #e0e6ed;
+  --shadow-color: rgba(44, 62, 80, 0.1);
+  --danger-color: #e74c3c;
+  --danger-hover: #c0392b;
+  --success-color: #2ecc71;
+}
+
+/* --- Հիմնական մակետ --- */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-light);
+  color: var(--text-dark);
+}
+
+header {
+  background-color: var(--background-white);
+  padding: 12px 30px;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 2px 5px var(--shadow-color);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5em;
+  color: var(--text-dark);
+}
+
+header p {
+  margin: 0;
+  color: var(--text-light);
+  flex: 1;
+}
+
+.admin-back {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.admin-back:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.admin-container {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr; /* Ձախ սյունը ավելի փոքր է */
+  grid-template-areas:
+    "add-form businesses"
+    "reviews businesses";
+  gap: 24px;
+  align-items: start;
+}
+
+.admin-section {
+  background: var(--background-white);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 3px 8px var(--shadow-color);
+}
+
+/* --- Գոտիների հատուկ դասավորություն --- */
+.admin-section:nth-of-type(1) { grid-area: add-form; }
+.admin-section:nth-of-type(2) { grid-area: businesses; }
+.admin-section:nth-of-type(3) { grid-area: reviews; }
+
+.admin-section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.3em;
+  color: var(--text-dark);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --- Ձևաթղթեր (Forms) --- */
+.admin-form .form-row {
+  margin-bottom: 16px;
+}
+.admin-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #555;
+}
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 1em;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.admin-form .grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.admin-form .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    align-items: end; /* Հավասարեցնում է կոճակը */
+}
+
+.admin-form button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+.admin-form button[type="submit"]:hover {
+    background-color: #27ae60;
+}
+
+/* Add review form adjustments */
+#add-review-form button[type="submit"] {
+    margin-top: 0;
+    padding: 10px 12px;
+    background-color: var(--primary-color);
+}
+#add-review-form button[type="submit"]:hover {
+    background-color: var(--primary-hover);
+}
+
+
+/* --- Գործիքագոտի (Toolbar) --- */
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.admin-toolbar h2 {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.admin-toolbar input[type="text"] {
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  min-width: 250px;
+}
+.badge {
+  background-color: #eef2ff;
+  color: #3730a3;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+/* --- Ցուցակներ --- */
+.admin-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 70vh; /* Սահմանափակում բարձրությունը */
+  overflow-y: auto;
+}
+.admin-item {
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.admin-item:first-child { padding-top: 0; }
+.admin-item:last-child { border-bottom: none; }
+.admin-item .row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+.admin-item .row.small {
+  font-size: 0.8em;
+  color: var(--text-light);
+}
+
+.admin-item .row.actions {
+  justify-content: flex-end;
+  gap: 8px;
+}
+.admin-item button {
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  cursor: pointer;
+  font-size: 0.85em;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.admin-item button:hover {
+  background: #f3f4f6;
+  border-color: #adb5bd;
+}
+
+.admin-item button.danger {
+  background: var(--danger-color);
+  border-color: var(--danger-color);
+  color: var(--text-white);
+}
+.admin-item button.danger:hover {
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+}
+
+.admin-item.selected {
+  background-color: #f0f8ff; /* Light blue background for selected item */
+  border-left: 4px solid var(--primary-color);
+  padding-left: 12px;
+  margin-left: -16px; /* Adjust for padding */
+}
+
+.muted {
+  color: var(--text-light);
+  font-style: italic;
+}
+
+/* --- Floating Action Buttons (FAB) --- */
+.fab {
+  position: fixed;
+  right: 24px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: var(--text-dark);
+  color: var(--text-white);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+  cursor: pointer;
+  z-index: 2500;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, transform 0.2s;
+}
+.fab:hover {
+  background: #34495e;
+  transform: translateY(-2px);
+}
+.fab-up { bottom: 84px; }
+.fab-down { bottom: 24px; }
+
+
+/* --- Toast --- */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(17, 24, 39, 0.95);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    z-index: 3000;
+    font-size: 0.95rem;
+    transition: opacity 0.3s, transform 0.3s;
+}
+.toast.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+  .admin-container {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "add-form"
+      "businesses"
+      "reviews";
+  }
+}
+@media (max-width: 768px) {
+  .admin-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .admin-toolbar input[type="text"] {
+    min-width: 0;
+    width: 100%;
+  }
+}

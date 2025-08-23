@@ -4,27 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ughi Admin</title>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
+    <!-- NOTE: Removed leaflet.css as it's not used here -->
+    <!-- Հիմնական ոճերը -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <!-- Ադմինի հատուկ ոճերը -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin.css') }}"
     />
   </head>
   <body>
     <header>
       <h1>Ughi Admin</h1>
-      <p>Կառավարեք վայրերն ու կարծիքները (MVP)</p>
-      <a href="/" class="admin-back">⬅ վերադարձ գլխավոր</a>
+      <p>Կառավարեք վայրերն ու կարծիքները</p>
+      <a href="/" class="admin-back">⬅ Վերադարձ գլխավոր էջ</a>
     </header>
     <div class="admin-container">
       <section class="admin-section">
-        <h2>Ավելացնել վայր</h2>
+        <h2>Ավելացնել նոր վայր</h2>
         <form id="add-business-form" class="admin-form">
           <div class="form-row">
-            <label for="biz-name">Անուն</label>
+            <label for="biz-name">Անվանում</label>
             <input id="biz-name" name="name" type="text" required />
           </div>
           <div class="form-row">
@@ -33,13 +36,13 @@
               id="biz-type"
               name="type"
               type="text"
-              placeholder="Hotel / Restaurant / Attraction"
+              placeholder="օր.՝ Hotel, Restaurant..."
               required
             />
           </div>
           <div class="form-row grid-2">
             <div>
-              <label for="biz-lat">Լատիտուդ</label>
+              <label for="biz-lat">Լայնություն (Latitude)</label>
               <input
                 id="biz-lat"
                 name="latitude"
@@ -49,7 +52,7 @@
               />
             </div>
             <div>
-              <label for="biz-lng">Լոնգիտուդ</label>
+              <label for="biz-lng">Երկայնություն (Longitude)</label>
               <input
                 id="biz-lng"
                 name="longitude"
@@ -59,13 +62,13 @@
               />
             </div>
           </div>
-          <button type="submit">Ավելացնել վայր</button>
+          <button type="submit">Ավելացնել</button>
         </form>
       </section>
 
       <section class="admin-section">
         <div class="admin-toolbar">
-          <h2>Վայեր <span id="biz-count" class="badge">0</span></h2>
+          <h2>Վայրեր <span id="biz-count" class="badge">0</span></h2>
           <input
             id="admin-search"
             type="text"
@@ -73,57 +76,58 @@
             aria-label="Որոնել վայր"
           />
         </div>
-        <ul id="admin-business-list" class="admin-list"></ul>
+        <ul id="admin-business-list" class="admin-list">
+          <!-- Վայրերը կցուցադրվեն այստեղ JS-ի միջոցով -->
+        </ul>
       </section>
 
       <section class="admin-section">
         <div class="admin-toolbar">
           <h2>Կարծիքներ</h2>
-          <span id="selected-business-label" class="muted"
-            >Ընտրեք վայր ցանկից</span
-          >
+        </div>
+        <div id="selected-business-label" class="muted" style="margin-bottom: 16px;">
+            Ընտրեք վայր՝ կարծիքները տեսնելու համար
         </div>
         <div id="reviews-admin">
-          <form id="add-review-form" class="admin-form">
+          <form id="add-review-form" class="admin-form hidden"> <!-- Սկզբնապես թաքնված -->
             <input type="hidden" id="admin-business-id" />
+            <div class="form-row">
+                <label for="admin-comment">Ավելացնել նոր մեկնաբանություն</label>
+                <textarea id="admin-comment" rows="3" required></textarea>
+              </div>
             <div class="form-row grid-3">
               <div>
                 <label for="admin-rating">Գնահատական</label>
                 <select id="admin-rating">
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
+                  <option value="5">5 ★★★★★</option>
+                  <option value="4">4 ★★★★☆</option>
+                  <option value="3">3 ★★★☆☆</option>
+                  <option value="2">2 ★★☆☆☆</option>
+                  <option value="1">1 ★☆☆☆☆</option>
                 </select>
               </div>
               <div>
-                <label for="admin-author">Ես՝</label>
+                <label for="admin-author">Հեղինակ</label>
                 <select id="admin-author">
                   <option value="Tourist">Շրջաշրջիկ</option>
                   <option value="Employee">Աշխատակից</option>
                 </select>
               </div>
               <div>
-                <label>&nbsp;</label>
-                <button type="submit">Ավելացնել կարծիք</button>
+                <button type="submit">Ավելացնել</button>
               </div>
             </div>
-            <div class="form-row">
-              <label for="admin-comment">Մեկնաբանություն</label>
-              <textarea id="admin-comment" rows="3" required></textarea>
-            </div>
           </form>
-          <ul id="admin-reviews-list" class="admin-list"></ul>
+          <ul id="admin-reviews-list" class="admin-list" style="margin-top: 16px;">
+             <!-- Կարծիքները կցուցադրվեն այստեղ -->
+          </ul>
         </div>
       </section>
     </div>
 
     <!-- Floating Up/Down buttons -->
     <button id="scroll-top" class="fab fab-up" aria-label="Վերև">↑</button>
-    <button id="scroll-bottom" class="fab fab-down" aria-label="Ներքև">
-      ↓
-    </button>
+    <button id="scroll-bottom" class="fab fab-down" aria-label="Ներքև">↓</button>
 
     <div id="toast" class="toast hidden" aria-live="polite"></div>
 
