@@ -17,12 +17,87 @@
     />
   </head>
   <body>
+    <!-- Drag & Drop Tooltip -->
+    <div
+      id="drag-tooltip"
+      class="drag-tooltip hidden"
+      role="status"
+      aria-live="polite"
+    >
+      <strong>💡 Հուշում:</strong> Սեղմեք և պահեք վայրերը 300մս, ապա քաշեք
+      վերև-ներքև՝ դասավորությունը փոխելու համար
+    </div>
+
     <header>
-      <h1>Ughi Admin</h1>
-      <p>Կառավարեք վայրերն ու կարծիքները</p>
+      <div class="header-content">
+        <h1>Ughi Admin</h1>
+        <p>Կառավարեք վայրերն ու կարծիքները</p>
+      </div>
+      <div class="header-actions">
+        <span class="user-info"
+          >Օգտատեր՝ {{ session.username }} ({{ session.role }})</span
+        >
+        <a href="/admin/logout" class="btn btn-danger">Ելք</a>
+      </div>
       <a href="/" class="admin-back">⬅ Վերադարձ գլխավոր էջ</a>
     </header>
+
+    <!-- Statistics Dashboard -->
+    <section class="admin-section stats-dashboard">
+      <h2>Վիճակագրություն</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="total-businesses">-</div>
+          <div class="stat-label">Ընդհանուր վայրեր</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="total-reviews">-</div>
+          <div class="stat-label">Ընդհանուր կարծիքներ</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="total-users">-</div>
+          <div class="stat-label">Ընդհանուր օգտատերեր</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="avg-rating">-</div>
+          <div class="stat-label">Միջին գնահատական</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="recent-reviews">-</div>
+          <div class="stat-label">Վերջին 7 օրվա կարծիքներ</div>
+        </div>
+      </div>
+      <div class="stats-charts">
+        <div class="chart-container">
+          <h3>Գնահատականների բաշխում</h3>
+          <div id="rating-chart" class="chart"></div>
+        </div>
+        <div class="chart-container">
+          <h3>Վայրերի տեսակներ</h3>
+          <div id="type-chart" class="chart"></div>
+        </div>
+      </div>
+    </section>
+
     <div class="admin-container">
+      <!-- User Management Section -->
+      <section class="admin-section">
+        <div class="admin-toolbar">
+          <h2>Օգտատերերի կառավարում</h2>
+          <div class="toolbar-actions">
+            <button id="add-user-btn" class="btn btn-primary">
+              Ավելացնել օգտատեր
+            </button>
+            <button id="bulk-delete-users-btn" class="btn btn-danger" disabled>
+              Զանգվածային ջնջում
+            </button>
+          </div>
+        </div>
+        <ul id="admin-users-list" class="admin-list">
+          <!-- Users will be loaded here via JavaScript -->
+        </ul>
+      </section>
+
       <section class="admin-section">
         <h2>Ավելացնել նոր վայր</h2>
         <form id="add-business-form" class="admin-form">
@@ -62,19 +137,25 @@
               />
             </div>
           </div>
-          <button type="submit">Ավելացնել</button>
+          <button type="submit" class="btn btn-success">Ավելացնել</button>
         </form>
       </section>
 
       <section class="admin-section">
         <div class="admin-toolbar">
           <h2>Վայրեր <span id="biz-count" class="badge">0</span></h2>
-          <input
-            id="admin-search"
-            type="text"
-            placeholder="Որոնել վայր..."
-            aria-label="Որոնել վայր"
-          />
+          <div class="toolbar-actions">
+            <input
+              id="admin-search"
+              type="text"
+              placeholder="Որոնել վայր..."
+              aria-label="Որոնել վայր"
+            />
+            <button id="bulk-delete-btn" class="btn btn-danger" disabled>
+              Զանգվածային ջնջում
+            </button>
+            <button id="export-btn" class="btn btn-secondary">Export</button>
+          </div>
         </div>
         <ul id="admin-business-list" class="admin-list">
           <!-- Վայրերը կցուցադրվեն այստեղ JS-ի միջոցով -->
@@ -84,17 +165,31 @@
       <section class="admin-section">
         <div class="admin-toolbar">
           <h2>Կարծիքներ</h2>
+          <div class="toolbar-actions">
+            <button
+              id="bulk-delete-reviews-btn"
+              class="btn btn-danger"
+              disabled
+            >
+              Զանգվածային ջնջում
+            </button>
+          </div>
         </div>
-        <div id="selected-business-label" class="muted" style="margin-bottom: 16px;">
-            Ընտրեք վայր՝ կարծիքները տեսնելու համար
+        <div
+          id="selected-business-label"
+          class="muted"
+          style="margin-bottom: 16px"
+        >
+          Ընտրեք վայր՝ կարծիքները տեսնելու համար
         </div>
         <div id="reviews-admin">
-          <form id="add-review-form" class="admin-form hidden"> <!-- Սկզբնապես թաքնված -->
+          <form id="add-review-form" class="admin-form hidden">
+            <!-- Սկզբնապես թաքնված -->
             <input type="hidden" id="admin-business-id" />
             <div class="form-row">
-                <label for="admin-comment">Ավելացնել նոր մեկնաբանություն</label>
-                <textarea id="admin-comment" rows="3" required></textarea>
-              </div>
+              <label for="admin-comment">Ավելացնել նոր մեկնաբանություն</label>
+              <textarea id="admin-comment" rows="3" required></textarea>
+            </div>
             <div class="form-row grid-3">
               <div>
                 <label for="admin-rating">Գնահատական</label>
@@ -114,20 +209,221 @@
                 </select>
               </div>
               <div>
-                <button type="submit">Ավելացնել</button>
+                <button type="submit" class="btn btn-primary">Ավելացնել</button>
               </div>
             </div>
           </form>
-          <ul id="admin-reviews-list" class="admin-list" style="margin-top: 16px;">
-             <!-- Կարծիքները կցուցադրվեն այստեղ -->
+          <ul
+            id="admin-reviews-list"
+            class="admin-list"
+            style="margin-top: 16px"
+          >
+            <!-- Կարծիքները կցուցադրվեն այստեղ -->
           </ul>
         </div>
       </section>
     </div>
 
+    <!-- Add User Modal -->
+    <div id="add-user-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Ավելացնել նոր օգտատեր</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <form id="add-user-form" class="admin-form">
+          <div class="form-row">
+            <label for="new-username">Օգտանուն</label>
+            <input id="new-username" name="username" type="text" required />
+          </div>
+          <div class="form-row">
+            <label for="new-email">Էլ. փոստ</label>
+            <input id="new-email" name="email" type="email" required />
+          </div>
+          <div class="form-row">
+            <label for="new-password">Գաղտնաբառ</label>
+            <input id="new-password" name="password" type="password" required />
+          </div>
+          <div class="form-row">
+            <label for="new-role">Դեր</label>
+            <select id="new-role" name="role">
+              <option value="admin">Admin</option>
+              <option value="moderator">Moderator</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeAddUserModal()"
+            >
+              Չեղարկել
+            </button>
+            <button type="submit" class="btn btn-primary">Ավելացնել</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="edit-user-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Խմբագրել օգտատեր</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <form id="edit-user-form" class="admin-form">
+          <input type="hidden" id="edit-user-id" />
+          <div class="form-row">
+            <label for="edit-username">Օգտանուն</label>
+            <input id="edit-username" name="username" type="text" required />
+          </div>
+          <div class="form-row">
+            <label for="edit-email">Էլ. փոստ</label>
+            <input id="edit-email" name="email" type="email" required />
+          </div>
+          <div class="form-row">
+            <label for="edit-password"
+              >Գաղտնաբառ (դատարկ թողնել՝ չփոխելու համար)</label
+            >
+            <input id="edit-password" name="password" type="password" />
+          </div>
+          <div class="form-row">
+            <label for="edit-role">Դեր</label>
+            <select id="edit-role" name="role">
+              <option value="admin">Admin</option>
+              <option value="moderator">Moderator</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="edit-user-active" name="is_active" />
+              Ակտիվ օգտատեր
+            </label>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeEditUserModal()"
+            >
+              Չեղարկել
+            </button>
+            <button type="submit" class="btn btn-primary">Պահպանել</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Business Modal -->
+    <div id="edit-business-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Խմբագրել վայր</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <form id="edit-business-form" class="admin-form">
+          <input type="hidden" id="edit-business-id" />
+          <div class="form-row">
+            <label for="edit-biz-name">Անվանում</label>
+            <input id="edit-biz-name" name="name" type="text" required />
+          </div>
+          <div class="form-row">
+            <label for="edit-biz-type">Տեսակ</label>
+            <input id="edit-biz-type" name="type" type="text" required />
+          </div>
+          <div class="form-row grid-2">
+            <div>
+              <label for="edit-biz-lat">Լայնություն</label>
+              <input
+                id="edit-biz-lat"
+                name="latitude"
+                type="number"
+                step="any"
+                required
+              />
+            </div>
+            <div>
+              <label for="edit-biz-lng">Երկայնություն</label>
+              <input
+                id="edit-biz-lng"
+                name="longitude"
+                type="number"
+                step="any"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeEditModal()"
+            >
+              Չեղարկել
+            </button>
+            <button type="submit" class="btn btn-primary">Պահպանել</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Review Modal -->
+    <div id="edit-review-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Խմբագրել կարծիք</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <form id="edit-review-form" class="admin-form">
+          <input type="hidden" id="edit-review-id" />
+          <div class="form-row">
+            <label for="edit-review-rating">Գնահատական</label>
+            <select id="edit-review-rating" name="rating">
+              <option value="5">5 ★★★★★</option>
+              <option value="4">4 ★★★★☆</option>
+              <option value="3">3 ★★★☆☆</option>
+              <option value="2">2 ★★☆☆☆</option>
+              <option value="1">1 ★☆☆☆☆</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="edit-review-comment">Մեկնաբանություն</label>
+            <textarea
+              id="edit-review-comment"
+              name="comment"
+              rows="3"
+              required
+            ></textarea>
+          </div>
+          <div class="form-row">
+            <label for="edit-review-author">Հեղինակ</label>
+            <select id="edit-review-author" name="author_type">
+              <option value="Tourist">Շրջաշրջիկ</option>
+              <option value="Employee">Աշխատակից</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeReviewModal()"
+            >
+              Չեղարկել
+            </button>
+            <button type="submit" class="btn btn-primary">Պահպանել</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Floating Up/Down buttons -->
     <button id="scroll-top" class="fab fab-up" aria-label="Վերև">↑</button>
-    <button id="scroll-bottom" class="fab fab-down" aria-label="Ներքև">↓</button>
+    <button id="scroll-bottom" class="fab fab-down" aria-label="Ներքև">
+      ↓
+    </button>
 
     <div id="toast" class="toast hidden" aria-live="polite"></div>
 

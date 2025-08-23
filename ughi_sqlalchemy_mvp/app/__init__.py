@@ -3,6 +3,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 import os
+import secrets
 
 # Initialize the database extension
 db = SQLAlchemy()
@@ -11,6 +12,10 @@ db = SQLAlchemy()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # Set a secret key for sessions if not already set
+    if not app.config.get("SECRET_KEY"):
+        app.config["SECRET_KEY"] = secrets.token_hex(32)
 
     # Ensure the instance folder exists
     try:

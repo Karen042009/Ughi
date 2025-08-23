@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="hy">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ughi Admin - Մուտք</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin.css') }}"
+    />
+    <style>
+      .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1rem;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .login-header h1 {
+        color: #111827;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.875rem;
+      }
+
+      .login-header p {
+        color: #6b7280;
+        margin: 0;
+      }
+
+      .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .form-group label {
+        font-weight: 500;
+        color: #374151;
+      }
+
+      .form-group input {
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .login-btn {
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .login-btn:hover {
+        background: #2563eb;
+      }
+
+      .login-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+      }
+
+      .error-message {
+        background: #fef2f2;
+        color: #dc2626;
+        padding: 0.75rem;
+        border-radius: 6px;
+        border: 1px solid #fecaca;
+        display: none;
+      }
+
+      .back-link {
+        text-align: center;
+        margin-top: 1.5rem;
+      }
+
+      .back-link a {
+        color: #6b7280;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .back-link a:hover {
+        color: #374151;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <h1>Ughi Admin</h1>
+          <p>Մուտք գործեք ձեր հաշիվ</p>
+        </div>
+
+        <form id="login-form" class="login-form">
+          <div class="form-group">
+            <label for="username">Օգտանուն</label>
+            <input type="text" id="username" name="username" required />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Գաղտնաբառ</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+
+          <div id="error-message" class="error-message"></div>
+
+          <button type="submit" class="login-btn" id="login-btn">
+            Մուտք գործել
+          </button>
+        </form>
+
+        <div class="back-link">
+          <a href="/">← Վերադարձ գլխավոր էջ</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const loginForm = document.getElementById("login-form");
+      const errorMessage = document.getElementById("error-message");
+      const loginBtn = document.getElementById("login-btn");
+
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = "block";
+      }
+
+      function hideError() {
+        errorMessage.style.display = "none";
+      }
+
+      function setLoading(loading) {
+        loginBtn.disabled = loading;
+        loginBtn.textContent = loading ? "Մուտք գործվում է..." : "Մուտք գործել";
+      }
+
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        hideError();
+        setLoading(true);
+
+        const formData = new FormData(loginForm);
+        const payload = {
+          username: formData.get("username"),
+          password: formData.get("password"),
+        };
+
+        try {
+          const response = await fetch("/admin/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            // Redirect to admin panel
+            window.location.href = data.redirect;
+          } else {
+            showError(data.error || "Մուտքի սխալ");
+          }
+        } catch (error) {
+          showError("Ցանցի սխալ");
+        } finally {
+          setLoading(false);
+        }
+      });
+    </script>
+  </body>
+</html>
